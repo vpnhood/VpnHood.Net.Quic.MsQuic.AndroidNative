@@ -167,7 +167,9 @@ CxPlatDpRawParseUdp(
         return;
     }
 
-    if (Length < QuicNetByteSwapShort(Udp->Length)) {
+    const uint16_t UdpLength = QuicNetByteSwapShort(Udp->Length);
+
+    if (Length < UdpLength) {
         QuicTraceEvent(
             DatapathErrorStatus,
             "[data][%p] ERROR, %u, %s.",
@@ -177,13 +179,23 @@ CxPlatDpRawParseUdp(
         return;
     }
 
+    if (UdpLength < sizeof(UDP_HEADER)) {
+        QuicTraceEvent(
+            DatapathErrorStatus,
+            "[data][%p] ERROR, %u, %s.",
+            Datapath,
+            UdpLength,
+            "UDP Length smaller than header size");
+        return;
+    }
+
     Packet->Reserved = L4_TYPE_UDP;
 
     Packet->Route->RemoteAddress.Ipv4.sin_port = Udp->SourcePort;
     Packet->Route->LocalAddress.Ipv4.sin_port = Udp->DestinationPort;
 
     Packet->Buffer = (uint8_t*)Udp->Data;
-    Packet->BufferLength = QuicNetByteSwapShort(Udp->Length) - sizeof(UDP_HEADER);
+    Packet->BufferLength = UdpLength - sizeof(UDP_HEADER);
 }
 
 _IRQL_requires_max_(DISPATCH_LEVEL)
@@ -288,7 +300,7 @@ CxPlatDpRawParseIPv4(
     }
 
     uint16_t IPTotalLength = CxPlatByteSwapUint16(IP->TotalLength);
-    if (Length < IPTotalLength) {
+    if (IPTotalLength < sizeof(IPV4_HEADER) || Length < IPTotalLength) {
         QuicTraceEvent(
             DatapathErrorStatus,
             "[data][%p] ERROR, %u, %s.",
