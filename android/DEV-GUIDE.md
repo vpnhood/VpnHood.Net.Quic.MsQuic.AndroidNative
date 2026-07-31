@@ -3,7 +3,7 @@
 Everything in this directory is VpnHood-specific and intentionally isolated so
 upstream msquic merges stay conflict-free.
 
-> **The primary build/publish path is CI, not this guide.** GitHub Actions builds both ABIs on Linux
+> **The primary build/publish path is CI, not this guide.** GitHub Actions builds all three ABIs on Linux
 > and publishes the NuGet on every push to `main` (see
 > [`.github/workflows/android-publish.yml`](../.github/workflows/android-publish.yml) and
 > [README.md](README.md)). This guide covers the **local Windows build**, needed only to iterate on the
@@ -67,12 +67,13 @@ pass-through. Future work: make junction creation conditional on spaces being pr
 ## Building
 
 ```powershell
-# from repo root — Release, both arches (default)
+# from repo root — Release, all arches (default)
 ./android/build-android.ps1
 
 # specific configuration / arch
 ./android/build-android.ps1 -Config Debug -Arch arm64
 ./android/build-android.ps1 -Config Release -Arch x64
+./android/build-android.ps1 -Config Release -Arch arm    # 32-bit armeabi-v7a
 
 # explicit NDK path (overrides auto-detect)
 ./android/build-android.ps1 -NdkPath "C:\AndroidNDK"
@@ -91,25 +92,26 @@ pass-through. Future work: make junction creation conditional on spaces being pr
 
 ### Target architectures
 
-Only two ABIs are built and shipped:
+Three ABIs are built and shipped:
 
-| Script `-Arch` | Android ABI | Notes |
-|----------------|-------------|-------|
-| `x64`          | `x86_64`    | Android emulator and x86-64 devices |
-| `arm64`        | `arm64-v8a` | All modern Android phones/tablets |
+| Script `-Arch` | Android ABI   | Notes                                          |
+|----------------|---------------|------------------------------------------------|
+| `x64`          | `x86_64`      | Android emulator and x86-64 devices            |
+| `arm64`        | `arm64-v8a`   | All modern Android phones/tablets              |
+| `arm`          | `armeabi-v7a` | 32-bit ARM, mainly Android TV boxes and sticks |
 
-32-bit ABIs (`x86`, `armeabi-v7a`) are intentionally excluded — VpnHood targets
-API 29+ devices where 64-bit is universal.
+`x86` (32-bit Intel) remains intentionally excluded — no meaningful device population.
 
 ### Outputs
 
 ```
 android/artifacts/android/
   arm64_Release_openssl/libmsquic.so   ← arm64-v8a
-  x64_Release_openssl/libmsquic.so    ← x86_64
+  arm_Release_openssl/libmsquic.so     ← armeabi-v7a
+  x64_Release_openssl/libmsquic.so     ← x86_64
 ```
 
-Both directories are git-ignored and regenerated on every run.
+All three directories are git-ignored and regenerated on every run.
 
 ---
 

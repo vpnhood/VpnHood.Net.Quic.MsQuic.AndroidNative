@@ -2,7 +2,7 @@
 
 A **self-contained native QUIC package for Android**. It ships:
 
-1. The **`libmsquic.so`** per ABI (`arm64-v8a`, `x86_64`) — **built by CI and packed into the NuGet**
+1. The **`libmsquic.so`** per ABI (`arm64-v8a`, `armeabi-v7a`, `x86_64`) — **built by CI and packed into the NuGet**
    (it flows into the consuming APK as `lib/<abi>/libmsquic.so`). The `.so` is **not committed**; it's
    git-ignored (`native/**/*.so`) and produced fresh on each build.
 2. The **`Microsoft.Quic` C# P/Invoke bindings** — a committed, self-contained copy under `Bindings/`
@@ -24,11 +24,12 @@ are **public**, consumers use them directly — no `InternalsVisibleTo` needed.
 
 ## Publishing a new version
 
-**Push to `main`** — GitHub Actions builds both ABIs, packs, and publishes `8.0.<run-number>` to
+**Push to `main`** — GitHub Actions builds all ABIs, packs, and publishes `8.0.<run-number>` to
 nuget.org (see [android/README.md](../README.md)). No manual version bump and no local build needed.
 
 For a **local** pack (rare): build the `.so` first with `android/build-android.ps1`; the
 `RefreshMsQuicNative` MSBuild target copies it into `native/<abi>/` before packing. Without a freshly
 built `.so` the build fails on purpose — there is no committed binary to fall back on.
 
-Only `arm64-v8a` and `x86_64` are produced; 32-bit ABIs are intentionally excluded.
+`arm64-v8a`, `armeabi-v7a` (32-bit ARM, needed for Android TV devices) and `x86_64` are produced;
+`x86` is intentionally excluded.

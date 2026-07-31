@@ -1,7 +1,7 @@
 # VpnHood — msquic for Android (native)
 
 A **fork of [microsoft/msquic](https://github.com/microsoft/msquic)** that cross-compiles msquic for
-Android (`arm64-v8a`, `x86_64`) with OpenSSL as the TLS backend, and publishes it as the NuGet package
+Android (`arm64-v8a`, `armeabi-v7a`, `x86_64`) with OpenSSL as the TLS backend, and publishes it as the NuGet package
 **`VpnHood.Core.Quic.MsQuic.AndroidNative`** (the native `libmsquic.so` + the `Microsoft.Quic` C# bindings).
 
 All VpnHood-specific code lives under this `android/` directory so merges from upstream msquic stay
@@ -11,7 +11,7 @@ conflict-free. The only changes outside it are the few source patches the Androi
 ## How it's built & published — the normal path
 
 **GitHub Actions builds and publishes on every push to `main`. No local toolchain is required.**
-[`.github/workflows/android-publish.yml`](../.github/workflows/android-publish.yml) cross-compiles both
+[`.github/workflows/android-publish.yml`](../.github/workflows/android-publish.yml) cross-compiles all
 ABIs on `ubuntu-latest`, packs the NuGet, and pushes it to nuget.org as **`8.0.<run-number>`**
 (auto-incrementing). Consumers float on `8.0.*` (or pin a version) and restore the newest build.
 
@@ -28,7 +28,7 @@ change before pushing. See **[DEV-GUIDE.md](DEV-GUIDE.md)** for prerequisites (W
 Perl, …) and how the build works under the hood.
 
 ```powershell
-./android/build-android.ps1          # Release, both arches -> android/artifacts/ (git-ignored)
+./android/build-android.ps1          # Release, all arches -> android/artifacts/ (git-ignored)
 ```
 
 ## Related docs

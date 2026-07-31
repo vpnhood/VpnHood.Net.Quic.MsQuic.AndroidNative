@@ -1,7 +1,7 @@
 #Requires -Version 7.2
 <#
 .SYNOPSIS
-    Builds msquic for Android x64 (x86_64) and arm64 (arm64-v8a) on Windows.
+    Builds msquic for Android x64 (x86_64), arm64 (arm64-v8a) and arm (armeabi-v7a) on Windows.
 
 .DESCRIPTION
     Locates the Android NDK, then runs CMake to cross-compile msquic for
@@ -11,7 +11,7 @@
     Build configuration: Debug or Release (default: Release)
 
 .PARAMETER Arch
-    Target architecture: x64, arm64, or both (default: both)
+    Target architecture: x64, arm64, arm, or all (default: all)
 
 .PARAMETER ApiLevel
     Android API level (default: 29)
@@ -34,8 +34,8 @@ param (
     [string]$Config = "Release",
 
     [Parameter(Mandatory = $false)]
-    [ValidateSet("x64", "arm64", "both")]
-    [string]$Arch = "both",
+    [ValidateSet("x64", "arm64", "arm", "all")]
+    [string]$Arch = "all",
 
     [Parameter(Mandatory = $false)]
     [int]$ApiLevel = 29,
@@ -100,7 +100,7 @@ function Find-AndroidNdk {
 # ---------------------------------------------------------------------------
 function Build-Android {
     param(
-        [string]$TargetArch,   # "x64" or "arm64"
+        [string]$TargetArch,   # "x64", "arm64" or "arm"
         [string]$Ndk
     )
 
@@ -108,6 +108,7 @@ function Build-Android {
     $androidAbi = switch ($TargetArch) {
         "x64"   { "x86_64" }
         "arm64" { "arm64-v8a" }
+        "arm"   { "armeabi-v7a" }
     }
 
     $buildDir     = Join-Path $RepoDir "build\android\${TargetArch}_openssl"
@@ -200,13 +201,18 @@ function Build-Android {
     New-Item -ItemType Directory -Force -Path $wrapperDir | Out-Null
     $clangBin = Join-Path $Ndk "toolchains\llvm\prebuilt\windows-x86_64\bin"
 
+    # GCC triple (wrapper name) → clang binary prefix. They differ only for 32-bit ARM:
+    # OpenSSL looks for arm-linux-androideabi-gcc but the NDK clang is armv7a-linux-androideabi<api>-clang.
     $tripleMap = @{
-        "x86_64"  = "x86_64-linux-android"
-        "arm64-v8a" = "aarch64-linux-android"
+        "x86_64-linux-android"  = "x86_64-linux-android"
+        "aarch64-linux-android" = "aarch64-linux-android"
+        "arm-linux-androideabi" = "armv7a-linux-androideabi"
     }
-    foreach ($triple in $tripleMap.Values) {
-        $clangExe    = Join-Path $clangBin "${triple}${ApiLevel}-clang.cmd"
-        $clangPPExe  = Join-Path $clangBin "${triple}${ApiLevel}-clang++.cmd"
+    foreach ($entry in $tripleMap.GetEnumerator()) {
+        $triple      = $entry.Key
+        $clangTriple = $entry.Value
+        $clangExe    = Join-Path $clangBin "${clangTriple}${ApiLevel}-clang.cmd"
+        $clangPPExe  = Join-Path $clangBin "${clangTriple}${ApiLevel}-clang++.cmd"
         $llvmBin     = Join-Path $clangBin "llvm-ar.exe"
         $llvmRanlib  = Join-Path $clangBin "llvm-ranlib.exe"
         $llvmStrip   = Join-Path $clangBin "llvm-strip.exe"
@@ -319,7 +325,8 @@ Write-Host "Using NDK: $ndk"
 $archsToBuild = switch ($Arch) {
     "x64"   { @("x64") }
     "arm64" { @("arm64") }
-    "both"  { @("x64", "arm64") }
+    "arm"   { @("arm") }
+    "all"   { @("x64", "arm64", "arm") }
 }
 
 foreach ($a in $archsToBuild) {

@@ -1,4 +1,4 @@
-# Builds libmsquic.so for Android (arm64-v8a + x86_64) on a Linux runner, packs the
+# Builds libmsquic.so for Android (arm64-v8a + armeabi-v7a + x86_64) on a Linux runner, packs the
 # VpnHood.Core.Quic.MsQuic.AndroidNative NuGet (native .so + Microsoft.Quic bindings)
 # and publishes it to nuget.org. Runs on every push to main; each push gets a new,
 # monotonically increasing version 8.0.<run-number>. Consumers float on 8.0.* and
@@ -56,7 +56,7 @@ jobs:
           echo "Using NDK: $NDK"
           echo "ndk=$NDK" >> "$GITHUB_OUTPUT"
 
-      - name: Build libmsquic.so (both ABIs)
+      - name: Build libmsquic.so (all ABIs)
         env:
           NDK: ${{ steps.ndk.outputs.ndk }}
         run: |
@@ -76,16 +76,20 @@ jobs:
           WRAP="$PWD/android-gcc-wrappers"
           mkdir -p "$WRAP"
           write_wrap() { printf '#!/bin/sh\nexec "%s" "$@"\n' "$2" > "$1"; chmod +x "$1"; }
+          # $1 = GCC triple (wrapper name), $2 = clang binary prefix (defaults to $1).
+          # They differ only for 32-bit ARM: GCC triple arm-linux-androideabi vs
+          # clang prefix armv7a-linux-androideabi.
           make_wrappers() {
-            local t="$1"
-            write_wrap "$WRAP/${t}-gcc"    "$NDK_BIN/${t}${ANDROID_API_LEVEL}-clang"
-            write_wrap "$WRAP/${t}-g++"    "$NDK_BIN/${t}${ANDROID_API_LEVEL}-clang++"
+            local t="$1" c="${2:-$1}"
+            write_wrap "$WRAP/${t}-gcc"    "$NDK_BIN/${c}${ANDROID_API_LEVEL}-clang"
+            write_wrap "$WRAP/${t}-g++"    "$NDK_BIN/${c}${ANDROID_API_LEVEL}-clang++"
             write_wrap "$WRAP/${t}-ar"     "$NDK_BIN/llvm-ar"
             write_wrap "$WRAP/${t}-ranlib" "$NDK_BIN/llvm-ranlib"
             write_wrap "$WRAP/${t}-strip"  "$NDK_BIN/llvm-strip"
           }
           make_wrappers aarch64-linux-android
           make_wrappers x86_64-linux-android
+          make_wrappers arm-linux-androideabi armv7a-linux-androideabi
           export PATH="$WRAP:$NDK_BIN:$PATH"
 
           build_abi() {
@@ -116,6 +120,7 @@ jobs:
             echo "Copied $ABI -> $NATIVE_DIR/$ABI/libmsquic.so ($(du -h "$SO" | cut -f1))"
           }
           build_abi arm64-v8a
+          build_abi armeabi-v7a
           build_abi x86_64
 
       - name: Setup .NET 10
@@ -133,14 +138,14 @@ jobs:
             -p:ContinuousIntegrationBuild=true \
             -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
 
-      - name: Verify package contents (both ABIs embedded)
+      - name: Verify package contents (all ABIs embedded)
         run: |
           set -euo pipefail
           pkg=$(ls ./nupkg/${PACKAGE_ID}.*.nupkg | head -n1)
           echo "Inspecting $pkg"
           aar=$(unzip -Z1 "$pkg" | grep -E '\.aar$' | head -n1)
           unzip -p "$pkg" "$aar" > /tmp/lib.aar
-          for abi in arm64-v8a x86_64; do
+          for abi in arm64-v8a armeabi-v7a x86_64; do
             if ! unzip -Z1 /tmp/lib.aar | grep -q "jni/$abi/libmsquic.so"; then
               echo "::error::missing jni/$abi/libmsquic.so in package"; exit 1
             fi

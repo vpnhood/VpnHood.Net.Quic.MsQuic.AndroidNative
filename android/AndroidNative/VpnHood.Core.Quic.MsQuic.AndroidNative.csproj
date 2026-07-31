@@ -65,10 +65,14 @@
 	<!-- The native libraries are built fresh by CI (.github/workflows/android-publish.yml), copied into
 	     native\<abi>\, and packed into the NuGet. They are NOT committed — for a local pack, build them
 	     first with android\build-android.ps1. They flow transitively into any consuming APK.
-	     Only arm64-v8a + x86_64 are produced. -->
+	     arm64-v8a + armeabi-v7a (32-bit, for Android TV devices) + x86_64 are produced; x86 is excluded. -->
 	<ItemGroup>
 		<AndroidNativeLibrary Include="$(MsQuicNativeDir)\arm64-v8a\libmsquic.so">
 			<Abi>arm64-v8a</Abi>
+			<Visible>false</Visible>
+		</AndroidNativeLibrary>
+		<AndroidNativeLibrary Include="$(MsQuicNativeDir)\armeabi-v7a\libmsquic.so">
+			<Abi>armeabi-v7a</Abi>
 			<Visible>false</Visible>
 		</AndroidNativeLibrary>
 		<AndroidNativeLibrary Include="$(MsQuicNativeDir)\x86_64\libmsquic.so">
@@ -81,16 +85,18 @@
 	     native\<abi>\ so the package ships the freshly built .so. The .so are git-ignored, so this is
 	     what populates native\ before pack. -->
 	<Target Name="RefreshMsQuicNative" BeforeTargets="BeforeBuild"
-			Condition="Exists('$(MsQuicArtifactsDir)\arm64_Release_openssl\libmsquic.so') And Exists('$(MsQuicArtifactsDir)\x64_Release_openssl\libmsquic.so')">
+			Condition="Exists('$(MsQuicArtifactsDir)\arm64_Release_openssl\libmsquic.so') And Exists('$(MsQuicArtifactsDir)\arm_Release_openssl\libmsquic.so') And Exists('$(MsQuicArtifactsDir)\x64_Release_openssl\libmsquic.so')">
 		<Copy SourceFiles="$(MsQuicArtifactsDir)\arm64_Release_openssl\libmsquic.so"
 			  DestinationFiles="$(MsQuicNativeDir)\arm64-v8a\libmsquic.so" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="$(MsQuicArtifactsDir)\arm_Release_openssl\libmsquic.so"
+			  DestinationFiles="$(MsQuicNativeDir)\armeabi-v7a\libmsquic.so" SkipUnchangedFiles="true" />
 		<Copy SourceFiles="$(MsQuicArtifactsDir)\x64_Release_openssl\libmsquic.so"
 			  DestinationFiles="$(MsQuicNativeDir)\x86_64\libmsquic.so" SkipUnchangedFiles="true" />
 	</Target>
 
 	<Target Name="CheckMsQuicNative" BeforeTargets="BeforeBuild" AfterTargets="RefreshMsQuicNative"
-			Condition="!Exists('$(MsQuicNativeDir)\arm64-v8a\libmsquic.so')">
-		<Error Text="Committed native library not found at '$(MsQuicNativeDir)\arm64-v8a\libmsquic.so'. Build the .so with android\build-android.ps1 (it lands in android\artifacts\) — this project then copies it into native\." />
+			Condition="!Exists('$(MsQuicNativeDir)\arm64-v8a\libmsquic.so') Or !Exists('$(MsQuicNativeDir)\armeabi-v7a\libmsquic.so') Or !Exists('$(MsQuicNativeDir)\x86_64\libmsquic.so')">
+		<Error Text="Native library missing under '$(MsQuicNativeDir)' (need arm64-v8a, armeabi-v7a and x86_64). Build the .so with android\build-android.ps1 (it lands in android\artifacts\) — this project then copies it into native\." />
 	</Target>
 
 </Project>
