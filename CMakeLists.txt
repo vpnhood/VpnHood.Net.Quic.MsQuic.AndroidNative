@@ -59,7 +59,7 @@ message(STATUS "Platform version: ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 set(QUIC_MAJOR_VERSION 2)
-set(QUIC_FULL_VERSION 2.6.0)
+set(QUIC_FULL_VERSION 2.7.0)
 
 if (WIN32)
     set(CX_PLATFORM "windows")
@@ -912,6 +912,7 @@ if(QUIC_CODE_CHECK)
             -cert-err33-c
             -clang-analyzer-optin.core.EnumCastOutOfRange
             -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
+            -clang-analyzer-unix.Stream
             -clang-diagnostic-invalid-unevaluated-string
             -clang-diagnostic-microsoft-anon-tag
             -concurrency-mt-unsafe
@@ -942,6 +943,8 @@ if(QUIC_CODE_CHECK)
             -readability-magic-numbers
             -readability-non-const-parameter
             -readability-redundant-casting
+            -readability-math-missing-parentheses
+            -readability-use-concise-preprocessor-directives
         )
         string(REPLACE ";" "," CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS}")
         set(CMAKE_C_CLANG_TIDY_AVAILABLE ${CLANGTIDY} -checks=${CLANG_TIDY_CHECKS}

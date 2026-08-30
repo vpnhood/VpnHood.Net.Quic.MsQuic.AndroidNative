@@ -1873,6 +1873,35 @@ QuicConnStart(
         goto Exit;
     }
 
+    if (ServerName == NULL) {
+        //
+        // If a server name is not provided, use the IP address for server certificate validation.
+        //
+        QUIC_ADDR_STR RemoteAddressString;
+        if (!QuicAddrIpToString(&Path->Route.RemoteAddress, &RemoteAddressString)) {
+            Status = QUIC_STATUS_INVALID_PARAMETER;
+            QuicTraceEvent(
+                ConnError,
+                "[conn][%p] ERROR, %s.",
+                Connection,
+                "Failed to convert remote address to server name");
+            goto Exit;
+        }
+
+        const size_t ServerNameLength = strlen(RemoteAddressString.Address);
+        ServerName = CXPLAT_ALLOC_NONPAGED(ServerNameLength + 1, QUIC_POOL_SERVERNAME);
+        if (ServerName == NULL) {
+            Status = QUIC_STATUS_OUT_OF_MEMORY;
+            QuicTraceEvent(
+                AllocFailure,
+                "Allocation of '%s' failed. (%llu bytes)",
+                "Server name",
+                ServerNameLength + 1);
+            goto Exit;
+        }
+        CxPlatCopyMemory((char*)ServerName, RemoteAddressString.Address, ServerNameLength + 1);
+    }
+
     QuicAddrSetPort(&Path->Route.RemoteAddress, ServerPort);
     QuicTraceEvent(
         ConnRemoteAddrAdded,
@@ -2333,6 +2362,12 @@ QuicConnGenerateLocalTransportParameters(
         MsQuicLib.ExecutionConfig != NULL &&
         MsQuicLib.ExecutionConfig->PollingIdleTimeoutUs != 0 ?
             0 : MS_TO_US(MsQuicLib.TimerResolutionMs);
+    //
+    // Ensure the advertised MaxAckDelay is not below MinAckDelay.
+    //
+    if (LocalTP->MinAckDelay > MS_TO_US(LocalTP->MaxAckDelay)) {
+        LocalTP->MaxAckDelay = US_TO_MS_CEIL(LocalTP->MinAckDelay);
+    }
     LocalTP->ActiveConnectionIdLimit = QUIC_ACTIVE_CONNECTION_ID_LIMIT;
     LocalTP->Flags =
         QUIC_TP_FLAG_INITIAL_MAX_DATA |
@@ -2579,8 +2614,6 @@ QuicConnSetConfiguration(
         if (QUIC_FAILED(Status)) {
             goto Cleanup;
         }
-        Connection->Crypto.TlsState.ClientAlpnList = NULL;
-        Connection->Crypto.TlsState.ClientAlpnListLength = 0;
     }
 
     Status = QuicConnGenerateLocalTransportParameters(Connection, &LocalTP);
@@ -3469,14 +3502,31 @@ QuicConnRecvVerNeg(
 {
     uint32_t SupportedVersion = 0;
 
-    // TODO - Validate the packet's SourceCid is equal to our DestCid.
+    //
+    // The Version Negotiation packet layout (see QUIC_VERSION_NEGOTIATION_PACKET)
+    // places the Source CID immediately after the Destination CID:
+    //
+    //   ... | DestCidLength (1) | DestCid (DestCidLength) |
+    //           SourceCidLength (1) | SourceCid (SourceCidLength) | SupportedVersions...
+    //
+    const uint8_t VnSourceCidLen =
+        Packet->VerNeg->DestCid[Packet->VerNeg->DestCidLength];
+    const uint8_t* VnSourceCid =
+        Packet->VerNeg->DestCid + Packet->VerNeg->DestCidLength + sizeof(uint8_t);
+
+    //
+    // Validate that the packet's Source CID matches our current Destination CID
+    //
+    const QUIC_CID_LIST_ENTRY* DestCid = Connection->Paths[0].DestCid;
+    CXPLAT_DBG_ASSERT(DestCid != NULL);
+    if (VnSourceCidLen != DestCid->CID.Length ||
+        memcmp(VnSourceCid, DestCid->CID.Data, VnSourceCidLen) != 0) {
+        QuicPacketLogDrop(Connection, Packet, "Version Negotiation Source CID doesn't match our Destination CID");
+        return;
+    }
 
     const uint32_t* ServerVersionList =
-        (const uint32_t*)(
-        Packet->VerNeg->DestCid +
-        Packet->VerNeg->DestCidLength +
-        sizeof(uint8_t) +                                         // SourceCidLength field size
-        Packet->VerNeg->DestCid[Packet->VerNeg->DestCidLength]);  // SourceCidLength
+        (const uint32_t*)(VnSourceCid + VnSourceCidLen);
     uint16_t ServerVersionListLength =
         (Packet->AvailBufferLength - (uint16_t)((uint8_t*)ServerVersionList - Packet->AvailBuffer)) / sizeof(uint32_t);
 
@@ -5555,7 +5605,7 @@ QuicConnRecvPostProcessing(
 
     if (Packet->HasNonProbingFrame &&
         Packet->NewLargestPacketNumber &&
-        !(*Path)->IsActive) {
+        !(*Path)->IsActive && (*Path)->InUse) {
         //
         // The peer has sent a non-probing frame on a path other than the active
         // one. This signals their intent to switch active paths.
