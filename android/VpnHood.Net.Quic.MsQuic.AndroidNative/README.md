@@ -1,4 +1,4 @@
-# VpnHood.Core.Quic.MsQuic.AndroidNative
+# VpnHood.Net.Quic.MsQuic.AndroidNative
 
 A **self-contained native QUIC package for Android**. It ships:
 
@@ -13,10 +13,10 @@ package reference.
 
 ## Consuming it
 
-`VpnHood.Core.Quic.Android` references the published NuGet:
+`VpnHood.Net.Quic.Android` references the published NuGet:
 
 ```xml
-<PackageReference Include="VpnHood.Core.Quic.MsQuic.AndroidNative" Version="8.0.*" />
+<PackageReference Include="VpnHood.Net.Quic.MsQuic.AndroidNative" Version="8.0.*" />
 ```
 
 It gets both the bundled `.so` (transitively, into the APK) and the bindings. Because the binding types

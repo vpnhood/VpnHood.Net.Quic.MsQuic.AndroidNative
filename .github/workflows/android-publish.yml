@@ -1,5 +1,5 @@
 # Builds libmsquic.so for Android (arm64-v8a + armeabi-v7a + x86_64) on a Linux runner, packs the
-# VpnHood.Core.Quic.MsQuic.AndroidNative NuGet (native .so + Microsoft.Quic bindings)
+# VpnHood.Net.Quic.MsQuic.AndroidNative NuGet (native .so + Microsoft.Quic bindings)
 # and publishes it to nuget.org. Runs on every push to main; each push gets a new,
 # monotonically increasing version 8.0.<run-number>. Consumers float on 8.0.* and
 # always restore the newest published build.
@@ -22,9 +22,9 @@ concurrency:
 
 env:
   ANDROID_API_LEVEL: "29"
-  PACKAGE_ID: VpnHood.Core.Quic.MsQuic.AndroidNative
-  CSPROJ: android/AndroidNative/VpnHood.Core.Quic.MsQuic.AndroidNative.csproj
-  NATIVE_DIR: android/AndroidNative/native
+  PACKAGE_ID: VpnHood.Net.Quic.MsQuic.AndroidNative
+  CSPROJ: android/VpnHood.Net.Quic.MsQuic.AndroidNative/VpnHood.Net.Quic.MsQuic.AndroidNative.csproj
+  NATIVE_DIR: android/VpnHood.Net.Quic.MsQuic.AndroidNative/native
 
 jobs:
   build-and-publish:

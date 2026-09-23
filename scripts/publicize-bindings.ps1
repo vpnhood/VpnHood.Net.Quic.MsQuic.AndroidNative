@@ -17,7 +17,7 @@ $ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $src = Join-Path $repoRoot "src\cs\lib"
-$dst = Join-Path $repoRoot "android\AndroidNative\Bindings"
+$dst = Join-Path $repoRoot "android\VpnHood.Net.Quic.MsQuic.AndroidNative\Bindings"
 
 $files = @(
     "msquic.cs",

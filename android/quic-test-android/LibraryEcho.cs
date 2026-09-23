@@ -1,8 +1,8 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using VpnHood.Core.Quic.Abstractions;
-using VpnHood.Core.Quic.Droid;
+using VpnHood.Net.Quic.Abstractions;
+using VpnHood.Net.Quic.Android;
 
 namespace VpnHood.QuicTest;
 

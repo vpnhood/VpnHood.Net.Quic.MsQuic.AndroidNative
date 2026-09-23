@@ -2,7 +2,7 @@
 
 A **fork of [microsoft/msquic](https://github.com/microsoft/msquic)** that cross-compiles msquic for
 Android (`arm64-v8a`, `armeabi-v7a`, `x86_64`) with OpenSSL as the TLS backend, and publishes it as the NuGet package
-**`VpnHood.Core.Quic.MsQuic.AndroidNative`** (the native `libmsquic.so` + the `Microsoft.Quic` C# bindings).
+**`VpnHood.Net.Quic.MsQuic.AndroidNative`** (the native `libmsquic.so` + the `Microsoft.Quic` C# bindings).
 
 All VpnHood-specific code lives under this `android/` directory so merges from upstream msquic stay
 conflict-free. The only changes outside it are the few source patches the Android/OpenSSL build needs
@@ -35,16 +35,16 @@ Perl, …) and how the build works under the hood.
 
 | Doc | Purpose |
 |-----|---------|
-| [AndroidNative/README.md](AndroidNative/README.md) | What the package ships and how `VpnHood.Core.Quic.Android` consumes it |
+| [VpnHood.Net.Quic.MsQuic.AndroidNative/README.md](VpnHood.Net.Quic.MsQuic.AndroidNative/README.md) | What the package ships and how `VpnHood.Net.Quic.Android` consumes it |
 | [DEV-GUIDE.md](DEV-GUIDE.md) | Local Windows build, the key source patches, and upstream-merge steps |
 
 ## Fresh clone & remotes
 
 ```bash
-git clone --recurse-submodules https://github.com/vpnhood/VpnHood.Core.Quic.MsQuic.AndroidNative.git
+git clone --recurse-submodules https://github.com/vpnhood/VpnHood.Net.Quic.MsQuic.AndroidNative.git
 ```
 
 | name       | url                                                      |
 |------------|----------------------------------------------------------|
-| `origin`   | https://github.com/vpnhood/VpnHood.Core.Quic.MsQuic.AndroidNative.git |
+| `origin`   | https://github.com/vpnhood/VpnHood.Net.Quic.MsQuic.AndroidNative.git |
 | `upstream` | https://github.com/microsoft/msquic.git                  |
