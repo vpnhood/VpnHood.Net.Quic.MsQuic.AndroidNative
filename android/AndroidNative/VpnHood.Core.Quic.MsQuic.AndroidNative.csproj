@@ -11,7 +11,6 @@
 		<SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
 		<AssemblyName>VpnHood.Core.Quic.MsQuic.AndroidNative</AssemblyName>
 		<RootNamespace>VpnHood.Core.Quic.MsQuic.AndroidNative</RootNamespace>
-		<!-- Published package name (used by `dotnet pack`). -->
 	</PropertyGroup>
 
 	<PropertyGroup>
