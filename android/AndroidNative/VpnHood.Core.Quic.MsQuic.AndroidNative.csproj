@@ -12,7 +12,6 @@
 		<AssemblyName>VpnHood.Core.Quic.MsQuic.AndroidNative</AssemblyName>
 		<RootNamespace>VpnHood.Core.Quic.MsQuic.AndroidNative</RootNamespace>
 		<!-- Published package name (used by `dotnet pack`). -->
-		<PackageId>VpnHood.Core.Quic.MsQuic.AndroidNative</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup>
