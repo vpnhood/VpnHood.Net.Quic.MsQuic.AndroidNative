@@ -18,6 +18,6 @@
 
   <!-- Reference the real library: provides AndroidQuicClient + bundles libmsquic.so transitively. -->
   <ItemGroup>
-    <ProjectReference Include="..\..\..\VpnHood\Src\Core\VpnHood.Core.Quic.Android\VpnHood.Core.Quic.Android.csproj" />
+    <ProjectReference Include="..\..\..\VpnHood\Src\Core\Quic\Quic.Android\VpnHood.Core.Quic.Android.csproj" />
   </ItemGroup>
 </Project>

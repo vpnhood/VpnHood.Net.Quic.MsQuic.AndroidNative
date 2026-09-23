@@ -131,7 +131,7 @@ from this repo:
 > becomes true with a bundled `libmsquic.so`) but **crashes in cert validation** (`X509_up_ref` on an
 > Android cert handle passed to OpenSSL): its validation is hard-wired to the OpenSSL crypto backend,
 > which clashes with Android's. Shipping `libcrypto`/`libssl`/the OpenSSL shim does not fix it. This
-> was tried and abandoned — see `VpnHood/Src/Core/VpnHood.Core.Quic.Android/README.md` for the full
+> was tried and abandoned — see `VpnHood/Src/Core/Quic/Quic.Android/README.md` for the full
 > rationale and the working client design (`AndroidQuicClient`/`Connection`/`Stream`,
 > `DEFER_CERTIFICATE_VALIDATION`, SNI handling).
 
