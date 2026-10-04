@@ -17,7 +17,8 @@ ABIs on `ubuntu-latest`, packs the NuGet, and pushes it to nuget.org as **`8.0.<
 
 - The native `.so` is **not committed** — it is built fresh by CI and packed into the package
   (`native/**/*.so` is git-ignored).
-- `NUGET_API_KEY` is an **organization secret** on the `vpnhood` GitHub org.
+- No stored NuGet key: the push uses nuget.org **Trusted Publishing** (policy by `trudyhood`, package
+  owner `vpnhood`, this repo + `android-publish.yml` — renaming the workflow file breaks publishing).
 
 **To ship a new native build: push to `main`.** That's the whole release process.
 

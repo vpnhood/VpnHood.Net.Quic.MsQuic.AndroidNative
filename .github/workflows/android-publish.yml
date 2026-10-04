@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write   # OIDC token for nuget.org trusted publishing (NuGet/login)
 
 concurrency:
   group: android-publish
@@ -152,13 +153,18 @@ jobs:
             echo "ok: jni/$abi/libmsquic.so"
           done
 
+      # Trusted publishing: exchange the workflow's OIDC token for a short-lived nuget.org API key
+      # (policy: vpnhood/VpnHood.Net.Quic.MsQuic.AndroidNative + android-publish.yml, created by trudyhood).
+      - name: NuGet login (trusted publishing)
+        id: nuget_login
+        uses: NuGet/login@v1
+        with:
+          user: trudyhood
+
       - name: Push to nuget.org
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          NUGET_API_KEY: ${{ steps.nuget_login.outputs.NUGET_API_KEY }}
         run: |
-          if [ -z "${NUGET_API_KEY:-}" ]; then
-            echo "::error::NUGET_API_KEY secret is not set on the repository"; exit 1
-          fi
           dotnet nuget push "./nupkg/${PACKAGE_ID}.${{ steps.ver.outputs.version }}.nupkg" \
             --source "https://api.nuget.org/v3/index.json" \
             --api-key "$NUGET_API_KEY" --skip-duplicate
