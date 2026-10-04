@@ -3,7 +3,7 @@ using VpnHood.QuicTest;
 
 // Desktop runner for the shared raw-msquic echo tester (same code path as the Android app).
 // Usage: quic-test <controlIp:port> <quicPort> [domain] [upBytes] [downBytes]
-var control = args.Length > 0 ? args[0] : "15.204.89.227:4040";
+var control = args.Length > 0 ? args[0] : "203.0.113.10:4040";
 var quicPort = args.Length > 1 ? int.Parse(args[1]) : 4041;
 var domain = args.Length > 2 ? args[2] : "test.vpnhood.com";
 long up = args.Length > 3 ? long.Parse(args[3]) : 64 * 1024;

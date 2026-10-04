@@ -28,7 +28,7 @@ public class MainActivity : Activity
 
             try {
                 var ok = LibraryEcho.Run(
-                    ip: "15.204.89.227", controlPort: 4040, quicPort: 4041,
+                    ip: "203.0.113.10", controlPort: 4040, quicPort: 4041,
                     domain: "test.vpnhood.com", up: 64 * 1024, down: 64 * 1024, log: Log)
                     .GetAwaiter().GetResult();
                 Log(ok ? ">>> RESULT: SUCCESS" : ">>> RESULT: FAILED");
