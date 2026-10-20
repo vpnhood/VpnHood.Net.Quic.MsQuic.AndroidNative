@@ -41,7 +41,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageProjectUrl>https://github.com/vpnhood/VpnHood.Net.Quic.MsQuic.AndroidNative</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/vpnhood/VpnHood.Net.Quic.MsQuic.AndroidNative</RepositoryUrl>
-		<Version>8.0.822</Version>
+		<Version>9.0.0</Version>
 		<FileVersion>$([System.DateTime]::Now.ToString("yyyy.M.d.HHmm"))</FileVersion>
 	</PropertyGroup>
 

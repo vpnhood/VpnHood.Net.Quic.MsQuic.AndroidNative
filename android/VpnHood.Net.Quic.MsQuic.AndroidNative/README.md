@@ -30,7 +30,7 @@ types are **public**, consumers use them directly — no `InternalsVisibleTo` ne
 
 ## Publishing a new version
 
-**Push to `main`** — GitHub Actions builds all ABIs, packs, and publishes `8.0.<run-number>` to
+**Push to `main`** — GitHub Actions builds all ABIs, packs, and publishes `9.0.<run-number>` to
 nuget.org (see [android/README.md](https://github.com/vpnhood/VpnHood.Net.Quic.MsQuic.AndroidNative/blob/main/android/README.md)).
 No manual version bump and no local build needed.
 

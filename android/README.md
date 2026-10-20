@@ -12,8 +12,8 @@ conflict-free. The only changes outside it are the few source patches the Androi
 
 **GitHub Actions builds and publishes on every push to `main`. No local toolchain is required.**
 [`.github/workflows/android-publish.yml`](../.github/workflows/android-publish.yml) cross-compiles all
-ABIs on `ubuntu-latest`, packs the NuGet, and pushes it to nuget.org as **`8.0.<run-number>`**
-(auto-incrementing). Consumers float on `8.0.*` (or pin a version) and restore the newest build.
+ABIs on `ubuntu-latest`, packs the NuGet, and pushes it to nuget.org as **`9.0.<run-number>`**
+(auto-incrementing). Consumers pin the version they tested.
 
 - The native `.so` is **not committed** — it is built fresh by CI and packed into the package
   (`native/**/*.so` is git-ignored).

@@ -1,7 +1,7 @@
 # Builds libmsquic.so for Android (arm64-v8a + armeabi-v7a + x86_64) on a Linux runner, packs the
 # VpnHood.Net.Quic.MsQuic.AndroidNative NuGet (native .so + Microsoft.Quic bindings)
 # and publishes it to nuget.org. Runs on every push to main; each push gets a new,
-# monotonically increasing version 8.0.<run-number>. Consumers pin the one they tested.
+# monotonically increasing version 9.0.<run-number>. Consumers pin the one they tested.
 #
 # This is the ONLY workflow this fork should carry. The upstream microsoft/msquic
 # workflows were removed on purpose (they build/test upstream msquic, not this package).
@@ -39,7 +39,7 @@ jobs:
 
       - name: Compute version
         id: ver
-        run: echo "version=8.0.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+        run: echo "version=9.0.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
 
       - name: Install build tools
         run: |
@@ -179,4 +179,4 @@ jobs:
       - name: Summary
         run: |
           echo "### Published ${PACKAGE_ID} ${{ steps.ver.outputs.version }} :rocket:" >> "$GITHUB_STEP_SUMMARY"
-          echo "Consumers floating on \`8.0.*\` will pick it up after indexing." >> "$GITHUB_STEP_SUMMARY"
+          echo "Consumers floating on \`9.0.*\` will pick it up after indexing." >> "$GITHUB_STEP_SUMMARY"
