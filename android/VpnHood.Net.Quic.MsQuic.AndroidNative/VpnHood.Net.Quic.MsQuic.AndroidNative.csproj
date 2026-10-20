@@ -32,21 +32,37 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageLicenseExpression>LGPL-2.1-only</PackageLicenseExpression>
+		<!-- What ships is Microsoft's MsQuic and its bindings (MIT) and OpenSSL, linked into the native
+		     library (Apache-2.0); both texts are packed under licenses\. -->
+		<PackageLicenseExpression>MIT AND Apache-2.0</PackageLicenseExpression>
 		<Company>OmegaHood LLC</Company>
 		<Copyright>© OmegaHood LLC. All rights reserved.</Copyright>
 		<PackageIcon>VpnHood.png</PackageIcon>
-		<PackageProjectUrl>https://github.com/vpnhood/vpnhood</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/vpnhood/vpnhood</RepositoryUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://github.com/vpnhood/VpnHood.Net.Quic.MsQuic.AndroidNative</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/vpnhood/VpnHood.Net.Quic.MsQuic.AndroidNative</RepositoryUrl>
 		<Version>8.0.822</Version>
 		<FileVersion>$([System.DateTime]::Now.ToString("yyyy.M.d.HHmm"))</FileVersion>
 	</PropertyGroup>
 
-	<!-- Pack the shared VpnHood icon into the NuGet (same as the other VpnHood packages). -->
+	<!-- Pack the shared VpnHood icon (same as the other VpnHood packages), this folder's README, which
+	     nuget.org shows, and the license texts of what the package ships into the NuGet. -->
 	<ItemGroup>
 		<None Include="VpnHood.png" Link="Resources\VpnHood.png">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
+		</None>
+		<None Update="README.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\..\LICENSE" Link="Resources\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath>licenses\</PackagePath>
+		</None>
+		<None Include="..\..\THIRD-PARTY-NOTICES" Link="Resources\THIRD-PARTY-NOTICES">
+			<Pack>True</Pack>
+			<PackagePath>licenses\</PackagePath>
 		</None>
 	</ItemGroup>
 
