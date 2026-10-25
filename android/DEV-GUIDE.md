@@ -117,6 +117,9 @@ All three directories are git-ignored and regenerated on every run.
 
 ## Consuming this from .NET (VpnHood QUIC on Android)
 
+The .NET projects under `android/` build with the .NET 11 SDK that `android/global.json` names; the
+root `global.json` is msquic's own (SDK 10), so run `dotnet` from `android/`.
+
 `VpnHood.Net.Quic.Android` drives MsQuic on Android via **P/Invoke over the C# bindings in
 `src/cs/lib`** — it does **NOT** use `System.Net.Quic`. So a .NET consumer needs exactly two things
 from this repo:

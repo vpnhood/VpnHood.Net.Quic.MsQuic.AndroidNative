@@ -7,7 +7,7 @@
 	     ================================================================================================ -->
 	<PropertyGroup>
 		<Description>Prebuilt MsQuic (libmsquic.so) for Android plus the Microsoft.Quic P/Invoke bindings. Self-contained: ships the native library per ABI and exposes the bindings. No VpnHood dependencies.</Description>
-		<TargetFramework>net10.0-android36.1</TargetFramework>
+		<TargetFramework>net11.0-android37.0</TargetFramework>
 		<SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
 		<AssemblyName>VpnHood.Net.Quic.MsQuic.AndroidNative</AssemblyName>
 		<RootNamespace>VpnHood.Net.Quic.MsQuic.AndroidNative</RootNamespace>
